@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace RatTracker_WPF.DispatchInterface
 {
@@ -43,13 +44,24 @@ namespace RatTracker_WPF.DispatchInterface
 		private async void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			List<KeyValuePair<string, string>> logindata = new List<KeyValuePair<string, string>>();
-			logindata.Add(new KeyValuePair<string, string>("email", m_UN));
-			logindata.Add(new KeyValuePair<string, string>("password", m_PW));
+			//logindata.Add(new KeyValuePair<string, string>("email", m_UN));
+			//logindata.Add(new KeyValuePair<string, string>("password", m_PW));
 
 			m_ApiWorker = new APIWorker();
-			object o = await m_ApiWorker.sendAPI("login", logindata);
 
-			Models.Api.Rat r = JsonConvert.DeserializeObject<Models.Api.Rat>(o.ToString());
+			//string o = await m_ApiWorker.sendAPI("login", logindata);
+
+			Dictionary<string, string> qd = new Dictionary<string, string>();
+			qd.Add("active", "true");
+			string o = await m_ApiWorker.queryAPI("rescues", qd);
+
+
+			JObject jsonRepsonse = JObject.Parse(o);
+			List<JToken> tokens = jsonRepsonse["data"].Children().ToList();
+
+			string s = tokens[2].ToString();
+
+			//Models.Api.Rat rat = JsonConvert.DeserializeObject<Models.Api.Rat>(tokens[3].ToString());
 		}
 	}
 }
